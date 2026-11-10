@@ -1,38 +1,44 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Today · Job Watcher</title>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b6b57">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1c3946">
 <link rel="icon" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css"></head><body>
-<nav id="nav"></nav><main>
-<h1>Today</h1>
-<p class="muted" id="runtime">Loading…</p>
-<div class="cards" id="cards"></div>
+<nav id="nav"></nav>
+<header class="hero"><h1>Today</h1><p>What changed on the job boards of 16 employers since the last run.</p><span class="stamp" id="runtime">Loading…</span></header>
+<section class="band"><h2>The Latest Run at a Glance</h2><p class="lede">Four counts from the most recent daily run.</p><div class="circles" id="cards"></div></section>
+<main>
 <h2>Sources</h2>
+<p class="lede">Every job board the tool reads, and whether it answered in the latest run.</p>
 <div id="sources"></div>
-<h2>New postings in the latest run</h2>
-<p class="muted small">Postings first seen in the latest run. Postings already open when a source was first watched are not counted as new.</p>
+<h2>New Postings in the Latest Run</h2>
+<p class="lede">Postings first seen in the latest run. Postings already open when a source was first watched are not counted as new.</p>
 <div id="new"></div>
-<h2>Removed postings in the latest run</h2>
+<h2>Removed Postings in the Latest Run</h2>
+<p class="lede">Postings a source no longer lists.</p>
 <div id="removed"></div>
 </main>
 <script src="assets/app.js"></script>
 <script>
 (async () => {
-  const { loadHistory, loadStatus, esc } = JW;
+  const { loadHistory, loadStatus, esc, fmt, sourceLabel } = JW;
   let status, rows;
   try { [status, rows] = await Promise.all([loadStatus(), loadHistory()]); }
-  catch (e) { document.getElementById("runtime").innerHTML = '<span class="notice">No data yet. The pipeline has not completed its first run, or you are offline and nothing has been cached.</span>'; return; }
+  catch (e) { document.getElementById("runtime").textContent = "No data yet"; document.getElementById("new").innerHTML = '<div class="notice">No data yet. The pipeline has not completed its first run, or you are offline and nothing has been cached.</div>'; return; }
   document.getElementById("runtime").textContent = `Last run: ${status.run_time} UTC`;
   // the four counts come from the status file; the lists are computed from the history file
-  const newRows = rows.filter(r => r.first_seen === status.run_time.slice(0, 10) && !r.first_run);
-  const remRows = rows.filter(r => r.removed_date === status.run_time.slice(0, 10));
-  const cards = [[status.days_with_success, "days with a successful run"], [status.open, "open"], [status.new_today, "new today"], [status.removed_today, "removed today"]];
-  document.getElementById("cards").innerHTML = cards.map(([n, l]) => `<div class="card"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join("");
-  document.getElementById("sources").innerHTML = `<table><thead><tr><th>Source</th><th>Status</th><th>Postings</th></tr></thead><tbody>` +
-    status.sources.map(s => `<tr><td>${esc(s.name)}</td><td class="${s.ok ? "ok" : "fail"}">${s.ok ? "OK" : "Failed"}</td><td>${s.count}</td></tr>`).join("") + `</tbody></table>`;
+  const day = status.run_time.slice(0, 10);
+  const newRows = rows.filter(r => r.first_seen === day && !r.first_run);
+  const remRows = rows.filter(r => r.removed_date === day);
+  const cards = [[status.days_with_success, "Days with a successful run"], [status.open, "Open"], [status.new_today, "New today"], [status.removed_today, "Removed today"]];
+  document.getElementById("cards").innerHTML = cards.map(([n, l]) => `<div class="circle"><div class="disc"><span class="num">${fmt(n)}</span></div><div class="lbl">${l}</div></div>`).join("");
+  const employer = {}; rows.forEach(r => employer[r.source] = r.employer);
+  document.getElementById("sources").innerHTML = `<table><thead><tr><th>Source</th><th>Status</th><th class="num">Postings</th></tr></thead><tbody>` +
+    status.sources.map(s => `<tr><td>${esc(sourceLabel(s.name, employer[s.name]))}</td><td class="${s.ok ? "ok" : "fail"}">${s.ok ? "OK" : "Failed"}</td><td class="num">${fmt(s.count)}</td></tr>`).join("") + `</tbody></table>`;
   const list = rs => rs.length ? `<ul class="postings">` + rs.map(r => `<li><div class="main"><div class="title"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title || "(untitled)")}</a></div>
-    <div class="small muted">${esc(r.employer)} · ${esc(r.location || "no location")}${r.in_role ? ' · <span class="pill">in role</span>' : ""}</div></div></li>`).join("") + `</ul>` : `<div class="empty">None in the latest run.</div>`;
+    <div class="small muted">${esc(r.employer)} · ${esc(r.location || "no location")}${r.in_role ? ' <span class="pill">In role</span>' : ""}</div></div></li>`).join("") + `</ul>` : `<div class="empty">None in the latest run.</div>`;
   document.getElementById("new").innerHTML = list(newRows);
   document.getElementById("removed").innerHTML = list(remRows);
 })();

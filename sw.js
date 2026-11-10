@@ -1,6 +1,6 @@
 /* Service worker: app shell is cached for offline use; data files are network-first so they stay fresh,
    falling back to the last copy that loaded when the computer is offline. */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `shell-${VERSION}`, DATA = `data-${VERSION}`;
 const SHELL_FILES = ["./", "index.html", "browse.html", "market.html", "manifest.webmanifest",
   "assets/style.css", "assets/app.js", "assets/market.js", "assets/charts.js", "assets/icon-192.png", "assets/icon-512.png"];

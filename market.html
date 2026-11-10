@@ -1,12 +1,14 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Market · Job Watcher</title>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b6b57">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1c3946">
 <link rel="icon" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css"></head><body>
-<nav id="nav"></nav><main>
-<h1>Market report</h1>
-<p class="muted" id="intro">Loading…</p>
+<nav id="nav"></nav>
+<header class="hero"><h1>Market Report</h1><p id="intro">Loading…</p></header>
+<main>
 <div id="report"></div>
 </main>
 <script src="assets/app.js"></script><script src="assets/market.js"></script><script src="assets/charts.js"></script>
@@ -14,11 +16,11 @@
 (async () => {
   let rows;
   try { rows = await JW.loadHistory(); } catch (e) { document.getElementById("intro").textContent = "No data yet. Come back after the first pipeline run."; return; }
-  const m = JWMarket.compute(rows), C = JWCharts, $ = x => x.toLocaleString();
+  const m = JWMarket.compute(rows), C = JWCharts, $ = x => x.toLocaleString("en-US");
   const days = [...new Set([...m.newAll, ...m.newRole, ...m.removedPerDay].map(p => p[0]))].sort();
   const total = a => a.reduce((s, p) => s + p[1], 0);
   document.getElementById("intro").textContent = `Computed in your browser from data/history.csv (${$(rows.length)} postings, last run ${m.lastRun}). Postings already open when watching began are left out where the section says so.`;
-  const sec = (title, text, chart) => `<h2>${title}</h2><p>${text}</p><div class="chart">${chart}</div>`;
+  const sec = (title, text, chart) => `<section class="finding"><h2>${JW.titleCase(title)}</h2><p>${text}</p><div class="chart">${chart}</div></section>`;
   const topEmp = m.openByEmployer[0], topLoc = m.topLocations[0];
   const md = m.daysOpen.median, q = m.quick;
   const html = [
@@ -33,14 +35,14 @@
       C.hbars(m.openByEmployer, { label: "Open postings per employer" })),
     sec(md === null ? "Days open: no completed postings yet" : `Postings that closed stayed open a median of ${md} day${md === 1 ? "" : "s"}`,
       md === null ? "This needs postings that were first seen after watching began and have since been removed." :
-      `Based on ${$(m.daysOpen.n)} removed postings that were not already open at the first run: removed date minus first-seen date, median ${md} days (shortest ${Math.min(...m.daysOpen.values)}, longest ${Math.max(...m.daysOpen.values)}).`,
+      `Based on ${$(m.daysOpen.n)} removed postings that were not already open at the first run: removed date minus first-seen date, median ${md} days (shortest ${$(Math.min(...m.daysOpen.values))}, longest ${$(Math.max(...m.daysOpen.values))}).`,
       C.hbars(histogram(m.daysOpen.values), { label: "Days open for removed postings" })),
-    sec(q.share === null ? "Share removed within seven days: not enough history yet" : `${(q.share * 100).toFixed(1)}% of postings were removed within seven days`,
+    sec(q.share === null ? "Share removed within seven days: not enough history yet" : `${(q.share * 100).toLocaleString("en-US", {maximumFractionDigits: 1})}% of postings were removed within seven days`,
       q.share === null ? "This needs postings first seen at least seven days before the last run." :
       `Of ${$(q.cohort)} postings that were not already open at the first run and were first seen at least seven days before the last run, ${$(q.removedWithin7)} were removed within seven days.`,
       C.hbars([["Removed within 7 days", q.removedWithin7], ["Everything else", q.cohort - q.removedWithin7]], { label: "Share removed within seven days" })),
     sec(topLoc ? `${topLoc[0]} is the top location (${$(topLoc[1])} open postings)` : "Top locations",
-      "The ten locations with the most open postings at the last run, using each source’s own location text.",
+      "The ten locations with the most open postings at the last run. Spellings of the same place are combined: Remote US and Remote - USA are one group, as are all San Francisco and all New York spellings. Postings listing several cities stay as written.",
       C.hbars(m.topLocations, { label: "Top locations among open postings" })),
   ];
   function histogram(vals) {
