@@ -1,0 +1,35 @@
+name: daily
+on:
+  schedule:
+    - cron: "17 11 * * *"   # once a day, 11:17 UTC
+  workflow_dispatch:
+concurrency:
+  group: daily
+  cancel-in-progress: false
+permissions:
+  contents: write
+  issues: write
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+      - name: Fetch sources, build history and status, open the day's issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python -m jobwatcher.pipeline
+      - name: Commit raw files, history and status
+        if: always()
+        run: |
+          git config user.name "job-watcher[bot]"
+          git config user.email "job-watcher@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Daily run $(date -u +%F)"
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push
