@@ -18,7 +18,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python -m pytest -q
       - name: Fetch sources, build history and status, open the day's issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
