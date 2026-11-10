@@ -1,20 +1,20 @@
 {
-  "run_time": "2026-11-10 00:30:48",
+  "run_time": "2026-11-10 18:40:59",
   "first_run_date": "2026-11-10",
   "days_with_success": 1,
-  "open": 4197,
+  "open": 4194,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
     {
       "name": "greenhouse-stripe",
       "ok": true,
-      "count": 772
+      "count": 776
     },
     {
       "name": "greenhouse-robinhood",
       "ok": true,
-      "count": 154
+      "count": 152
     },
     {
       "name": "greenhouse-coinbase",
@@ -24,17 +24,17 @@
     {
       "name": "greenhouse-affirm",
       "ok": true,
-      "count": 221
+      "count": 213
     },
     {
       "name": "greenhouse-brex",
       "ok": true,
-      "count": 265
+      "count": 276
     },
     {
       "name": "greenhouse-databricks",
       "ok": true,
-      "count": 915
+      "count": 914
     },
     {
       "name": "greenhouse-sofi",
@@ -44,22 +44,22 @@
     {
       "name": "greenhouse-chime",
       "ok": true,
-      "count": 67
+      "count": 66
     },
     {
       "name": "greenhouse-block",
       "ok": true,
-      "count": 201
+      "count": 199
     },
     {
       "name": "greenhouse-toast",
       "ok": true,
-      "count": 335
+      "count": 330
     },
     {
       "name": "greenhouse-gusto",
       "ok": true,
-      "count": 80
+      "count": 81
     },
     {
       "name": "lever-palantir",
@@ -74,17 +74,17 @@
     {
       "name": "ashby-ramp",
       "ok": true,
-      "count": 171
+      "count": 173
     },
     {
       "name": "ashby-notion",
       "ok": true,
-      "count": 153
+      "count": 152
     },
     {
       "name": "ashby-plaid",
       "ok": true,
-      "count": 141
+      "count": 140
     }
   ]
 }
