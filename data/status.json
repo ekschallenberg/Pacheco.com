@@ -1,15 +1,15 @@
 {
-  "run_time": "2026-11-21 17:58:13",
+  "run_time": "2026-11-22 18:30:56",
   "first_run_date": "2026-11-10",
-  "days_with_success": 12,
-  "open": 4187,
-  "new_today": 30,
-  "removed_today": 32,
+  "days_with_success": 13,
+  "open": 4182,
+  "new_today": 0,
+  "removed_today": 5,
   "sources": [
     {
       "name": "greenhouse-stripe",
       "ok": true,
-      "count": 778
+      "count": 777
     },
     {
       "name": "greenhouse-robinhood",
@@ -34,7 +34,7 @@
     {
       "name": "greenhouse-databricks",
       "ok": true,
-      "count": 895
+      "count": 893
     },
     {
       "name": "greenhouse-sofi",
@@ -54,7 +54,7 @@
     {
       "name": "greenhouse-toast",
       "ok": true,
-      "count": 326
+      "count": 324
     },
     {
       "name": "greenhouse-gusto",
